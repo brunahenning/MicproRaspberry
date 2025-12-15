@@ -202,30 +202,43 @@ def preditor_continuo(X_raw, modelo, scaler, pca, limiar_alerta=0.65, save_fig=F
 #################################################################################################
 
 if __name__ == '__main__':
+    print("\n================ INICIALIZAÇÃO DO SISTEMA =================")
+    print("Sistema iniciado com sucesso na Raspberry Pi.")
     base_path = "/home/pi/MicproRaspberry/synthetic_hrv_bigsep"  # ajuste para Raspberry Pi
     n_pacientes = 50
 
+    print("\n[1/7] Carregando modelo treinado (SVM + Scaler + PCA)...")
     # Carregar modelo treinado
     data = joblib.load("modelo_svm.joblib")
     modelo_svm = data['modelo']
     scaler = data['scaler']
     pca = data['pca']
+    print("Modelo carregado com sucesso.")
 
+    print("\n[2/7] Carregando e processando dados ECG...")
     # Carregar dados de teste
     X_raw, y = carregar_todos_pacientes(base_path, n_pacientes)
+    print(f"Total de janelas processadas: {len(y)}")
 
+    print("\n[3/7] Realizando divisão treino/teste (70/30)...")
     # Split 70/30
     X_train, X_test, y_train, y_test = train_test_split(
         X_raw, y, test_size=0.30, random_state=42, stratify=y
     )
-
+    print("Divisão concluída.")
+    
+    print("\n[4/7] Aplicando normalização e PCA (modelo treinado)...")
     # PCA (usar scaler e pca do modelo)
     X_test_scaled = scaler.transform(X_test)
     X_test_pca = pca.transform(X_test_scaled)
+    print(f"Número de componentes PCA: {X_test_pca.shape[1]}")
 
+    print("\n[5/7] Executando predição com SVM..."
     # Predição
     y_pred = modelo_svm.predict(X_test_pca)
+    print("Predição finalizada.")
 
+    print("\n[6/7] Calculando métricas de desempenho...")
     # Métricas
     metricas = calcular_metricas(y_test, y_pred)
     print("\n=== Métricas do Modelo ===")
@@ -236,6 +249,7 @@ if __name__ == '__main__':
     print(f"Sensibilidade: {metricas['sensibilidade']:.3f}")
     print(f"Taxa de falsos positivos: {metricas['fp_rate']:.3f}")
 
+    print("\nGerando matriz de confusão...")
     # Matriz de confusão
     cm = metricas['confusion_matrix']
     plt.figure(figsize=(5,4))
@@ -247,6 +261,7 @@ if __name__ == '__main__':
     plt.title('Matriz de Confusão')
     plt.show()
 
+    print("\n[7/7] Monitorando uso de memória...")
     # Memória total usada
     process = psutil.Process()
     mem_info = process.memory_full_info()
