@@ -202,7 +202,7 @@ def preditor_continuo(X_raw, modelo, scaler, pca, limiar_alerta=0.65, save_fig=F
 #################################################################################################
 
 if __name__ == '__main__':
-    base_path = "C:/Nova_tentativa_tcc/synthetic_hrv_bigsep"  # ajuste para Raspberry Pi
+    base_path = "/home/pi/MicproRaspberry/synthetic_hrv_bigsep"  # ajuste para Raspberry Pi
     n_pacientes = 50
 
     # Carregar modelo treinado
