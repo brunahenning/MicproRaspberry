@@ -207,7 +207,7 @@ if __name__ == '__main__':
     print("\n================ INICIALIZAÇÃO DO SISTEMA =================")
     print("Sistema iniciado com sucesso na Raspberry Pi.")
     base_path = "/home/pi/MicproRaspberry/synthetic_hrv_bigsep"  # ajuste para Raspberry Pi
-    n_pacientes = 50
+    n_pacientes = 2
 
     print("\n[1/7] Carregando modelo treinado (SVM + Scaler + PCA)...")
     # Carregar modelo treinado
