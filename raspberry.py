@@ -93,6 +93,7 @@ def sliding_window_hrv(ecg, fs=fs, Wo=Wo, S=S):
         seg = ecg[start:start+Wo_s]
         X.append(extract_hrv_parameters(seg, fs))
     return np.array(X)
+print(f"[HRV] Total de janelas processadas: {len(X)}")
 
 #################################################################################################
 # LABELS
@@ -126,6 +127,7 @@ def carregar_todos_pacientes(base_path, n_pacientes=None):
         registros = registros[:n_pacientes]
     all_X, all_y = [], []
     for rec in registros:
+        print(f"\n[DATA] Processando paciente {i+1}/{len(registros)} → {rec}")
         path_record = os.path.join(base_path, rec)
         record = wfdb.rdrecord(path_record)
         ecg = record.p_signal[:,0]
