@@ -90,7 +90,7 @@ def calculate_hrv_metrics(rpeaks, fs=fs):
 
 def extract_hrv_parameters(ecg_segment, fs=fs):
     rpeaks = detect_r_peaks_cwt(ecg_segment, sampling_rate=fs)
-    xrr = len(rpeaks) >= 3 
+    xrr = 0  # len(rpeaks) >= 3 
     #check_ecg_quality(rpeaks)
     print("xrr")
     
