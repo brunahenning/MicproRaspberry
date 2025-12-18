@@ -57,7 +57,7 @@ def check_ecg_quality(rpeaks):
 print("saindo do ecg_quality")
 
 def calculate_hrv_metrics(rpeaks, fs=fs):
-    rr_intervals = np.diff(rpeaks)/fs
+    #rr_intervals = np.diff(rpeaks)/fs
     print("1")
     if len(rr_intervals)<2:
         print("2")
