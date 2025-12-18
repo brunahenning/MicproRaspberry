@@ -58,10 +58,14 @@ print("saindo do ecg_quality")
 
 def calculate_hrv_metrics(rpeaks, fs=fs):
     rr_intervals = np.diff(rpeaks)/fs
+    print("1")
     if len(rr_intervals)<2:
+        print("2")
         return [0]*7
     sdnn = np.std(rr_intervals)
+    print("3")
     rmssd = np.sqrt(np.mean(np.diff(rr_intervals)**2))
+    print("4")
     try:
         hrv = nk.hrv(rpeaks, sampling_rate=fs)
         lf = hrv.get('HRV_LF',[0])[0]
