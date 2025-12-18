@@ -121,36 +121,26 @@ def gerar_labels_por_janela(labels, Wo=Wo, S=S, fs=fs):
 # CARREGAMENTO DE PACIENTES
 #################################################################################################
 
-def carregar_todos_pacientes(base_path, n_pacientes=None):
-    registros = sorted([f.replace(".hea","") for f in os.listdir(base_path) if f.endswith(".hea")])
-    
-    if n_pacientes is not None:
-        registros = registros[:n_pacientes]
-
+def carregar_todos_pacientes(base_path, registros=None):
+    if registros is None:
+        registros = sorted([f.replace(".hea","") for f in os.listdir(base_path) if f.endswith(".hea")])
     all_X, all_y = [], []
-
-    for i, rec in enumerate(registros):
-        print(f"\n[DATA] Processando paciente {i+1}/{len(registros)} → {rec}")
-
+    for rec in registros:
         path_record = os.path.join(base_path, rec)
         record = wfdb.rdrecord(path_record)
         ecg = record.p_signal[:,0]
         fs = record.fs
-
         ecg = butterworth_filter(ecg, fs)
-
-        path_seiz = os.path.join(base_path, rec + ".seizures")
-        with open(path_seiz, "r") as f:
+        path_seiz = os.path.join(base_path, rec+".seizures")
+        with open(path_seiz,"r") as f:
             onsets = [float(line.strip().split()[0]) for line in f]
-
         labels_amostra = gerar_labels_inter_pre(len(ecg), fs, onsets)
         X = sliding_window_hrv(ecg, fs)
         y = gerar_labels_por_janela(labels_amostra)
-
         all_X.append(X)
         all_y.append(y)
-
     return np.vstack(all_X), np.hstack(all_y)
+
 
 
 #################################################################################################
@@ -188,26 +178,26 @@ def calcular_metricas(y_true, y_pred):
 # PREDITOR CONTÍNUO
 #################################################################################################
 
-def preditor_continuo(X_raw, modelo, scaler, pca, limiar_alerta=0.65, save_fig=False, fig_name='predicao_continua.png'):
-    X_scaled = scaler.transform(X_raw)
-    X_pca = pca.transform(X_scaled)
-    probs = modelo.predict_proba(X_pca)[:, 1]
-    alertas = [(i, p) for i, p in enumerate(probs) if p >= limiar_alerta]
+# def preditor_continuo(X_raw, modelo, scaler, pca, limiar_alerta=0.65, save_fig=False, fig_name='predicao_continua.png'):
+#     X_scaled = scaler.transform(X_raw)
+#     X_pca = pca.transform(X_scaled)
+#     probs = modelo.predict_proba(X_pca)[:, 1]
+#     alertas = [(i, p) for i, p in enumerate(probs) if p >= limiar_alerta]
 
-    plt.figure(figsize=(12,4))
-    plt.plot(probs, marker='o')
-    plt.axhline(y=limiar_alerta, linestyle='--', linewidth=1.5, label=f'Limiar alerta = {limiar_alerta}')
-    plt.xlabel('Índice da Janela')
-    plt.ylabel('Probabilidade de Pré-ictal')
-    plt.title('Predição Contínua - Probabilidade de Pré-ictal por Janela')
-    plt.legend()
-    plt.grid(True)
-    plt.tight_layout()
-    if save_fig:
-        plt.savefig(fig_name)
-    plt.show()
+#     plt.figure(figsize=(12,4))
+#     plt.plot(probs, marker='o')
+#     plt.axhline(y=limiar_alerta, linestyle='--', linewidth=1.5, label=f'Limiar alerta = {limiar_alerta}')
+#     plt.xlabel('Índice da Janela')
+#     plt.ylabel('Probabilidade de Pré-ictal')
+#     plt.title('Predição Contínua - Probabilidade de Pré-ictal por Janela')
+#     plt.legend()
+#     plt.grid(True)
+#     plt.tight_layout()
+#     if save_fig:
+#         plt.savefig(fig_name)
+#     plt.show()
 
-    return probs, alertas
+#     return probs, alertas
 
 #################################################################################################
 # EXECUÇÃO PRINCIPAL
@@ -225,18 +215,9 @@ if __name__ == '__main__':
 
     PACIENTE_ID = "synth_02"
     registros = [PACIENTE_ID]
-    
-    # # Validação silenciosa
-    # arquivo_hea = os.path.join(base_path, PACIENTE_ID + ".hea")
-    # arquivo_seiz = os.path.join(base_path, PACIENTE_ID + ".seizures")
 
-    # if not os.path.exists(arquivo_hea):
-    # raise FileNotFoundError(f"Arquivo não encontrado: {arquivo_hea}")
+    X_raw, y = carregar_todos_pacientes(base_path, registros)
 
-    # if not os.path.exists(arquivo_seiz):
-    # raise FileNotFoundError(f"Arquivo não encontrado: {arquivo_seiz}")
-    
-    n_pacientes = 1
     
     print("\n[1/7] Carregando modelo treinado (SVM + Scaler + PCA)...")
     # Carregar modelo treinado
