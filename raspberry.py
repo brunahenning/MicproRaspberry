@@ -226,7 +226,7 @@ if __name__ == '__main__':
     # if not os.path.exists(arquivo_seiz):
     # raise FileNotFoundError(f"Arquivo não encontrado: {arquivo_seiz}")
     
-      n_pacientes = 1
+    n_pacientes = 1
     
     print("\n[1/7] Carregando modelo treinado (SVM + Scaler + PCA)...")
     # Carregar modelo treinado
