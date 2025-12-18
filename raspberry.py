@@ -208,17 +208,17 @@ if __name__ == '__main__':
     print("Sistema iniciado com sucesso na Raspberry Pi.")
     # base_path = "/home/pi/MicproRaspberry/synthetic_hrv_bigsep"  # ajuste para Raspberry Pi
     # n_pacientes = 2
-    
+    print("1")
     
     base_path = "/home/pi/MicproRaspberry/synthetic_hrv_bigsep"  # ajuste para Raspberry Pi
     # base_path = "C:/Nova_tentativa_tcc/synthetic_hrv_bigsep"
-
+    print("2")
     PACIENTE_ID = "synth_02"
     registros = [PACIENTE_ID]
-
+    print("3")
     X_raw, y = carregar_todos_pacientes(base_path, registros)
 
-    
+    print("4")
     print("\n[1/7] Carregando modelo treinado (SVM + Scaler + PCA)...")
     # Carregar modelo treinado
     data = joblib.load("modelo_svm.joblib")
