@@ -93,7 +93,6 @@ def sliding_window_hrv(ecg, fs=fs, Wo=Wo, S=S):
         seg = ecg[start:start+Wo_s]
         X.append(extract_hrv_parameters(seg, fs))
     return np.array(X)
-# print(f"[HRV] Total de janelas processadas: {len(X)}")
 
 #################################################################################################
 # LABELS
@@ -141,8 +140,6 @@ def carregar_todos_pacientes(base_path, registros=None):
         all_y.append(y)
     return np.vstack(all_X), np.hstack(all_y)
 
-
-
 #################################################################################################
 # PCA (para teste)
 #################################################################################################
@@ -175,84 +172,42 @@ def calcular_metricas(y_true, y_pred):
             'confusion_matrix': cm}
 
 #################################################################################################
-# PREDITOR CONTÍNUO
-#################################################################################################
-
-# def preditor_continuo(X_raw, modelo, scaler, pca, limiar_alerta=0.65, save_fig=False, fig_name='predicao_continua.png'):
-#     X_scaled = scaler.transform(X_raw)
-#     X_pca = pca.transform(X_scaled)
-#     probs = modelo.predict_proba(X_pca)[:, 1]
-#     alertas = [(i, p) for i, p in enumerate(probs) if p >= limiar_alerta]
-
-#     plt.figure(figsize=(12,4))
-#     plt.plot(probs, marker='o')
-#     plt.axhline(y=limiar_alerta, linestyle='--', linewidth=1.5, label=f'Limiar alerta = {limiar_alerta}')
-#     plt.xlabel('Índice da Janela')
-#     plt.ylabel('Probabilidade de Pré-ictal')
-#     plt.title('Predição Contínua - Probabilidade de Pré-ictal por Janela')
-#     plt.legend()
-#     plt.grid(True)
-#     plt.tight_layout()
-#     if save_fig:
-#         plt.savefig(fig_name)
-#     plt.show()
-
-#     return probs, alertas
-
-#################################################################################################
 # EXECUÇÃO PRINCIPAL
 #################################################################################################
 
 if __name__ == '__main__':
-    print("\n================ INICIALIZAÇÃO DO SISTEMA =================")
-    print("Sistema iniciado com sucesso na Raspberry Pi.")
-    # base_path = "/home/pi/MicproRaspberry/synthetic_hrv_bigsep"  # ajuste para Raspberry Pi
-    # n_pacientes = 2
-    print("1")
-    
-    base_path = "/home/pi/MicproRaspberry/synthetic_hrv_bigsep"  # ajuste para Raspberry Pi
-    # base_path = "C:/Nova_tentativa_tcc/synthetic_hrv_bigsep"
-    print("2")
+    # print("\n================ INICIALIZAÇÃO DO SISTEMA =================")
+    # print("Sistema iniciado com sucesso na Raspberry Pi.")
+
+    base_path = "/home/pi/MicproRaspberry/synthetic_hrv_bigsep"
     PACIENTE_ID = "synth_02"
     registros = [PACIENTE_ID]
-    print("3")
-    X_raw, y = carregar_todos_pacientes(base_path, registros)
 
-    print("4")
-    print("\n[1/7] Carregando modelo treinado (SVM + Scaler + PCA)...")
-    # Carregar modelo treinado
+    # print("\n[1/7] Carregando modelo treinado (SVM + Scaler + PCA)...")
     data = joblib.load("modelo_svm.joblib")
     modelo_svm = data['modelo']
     scaler = data['scaler']
     pca = data['pca']
-    print("Modelo carregado com sucesso.")
+    # print("Modelo carregado com sucesso.")
 
-    print("\n[2/7] Carregando e processando dados ECG...")
-    # Carregar dados de teste
-    X_raw, y = carregar_todos_pacientes(base_path, n_pacientes)
-   
+    # print("\n[2/7] Carregando e processando dados ECG...")
+    X_raw, y = carregar_todos_pacientes(base_path, registros)
 
-    print("\n[3/7] Realizando divisão treino/teste (70/30)...")
-    # Split 70/30
+    # print("\n[3/7] Realizando divisão treino/teste (70/30)...")
     X_train, X_test, y_train, y_test = train_test_split(
         X_raw, y, test_size=0.30, random_state=42, stratify=y
     )
-    print("Divisão concluída.")
-    
-    print("\n[4/7] Aplicando normalização e PCA (modelo treinado)...")
-    # PCA (usar scaler e pca do modelo)
+
+    # print("\n[4/7] Aplicando normalização e PCA (modelo treinado)...")
     X_test_scaled = scaler.transform(X_test)
     X_test_pca = pca.transform(X_test_scaled)
-    print(f"Número de componentes PCA: {X_test_pca.shape[1]}")
 
-    print("\n[5/7] Executando predição com SVM...")
-    # Predição
+    # print("\n[5/7] Executando predição com SVM...")
     y_pred = modelo_svm.predict(X_test_pca)
-    print("Predição finalizada.")
 
-    print("\n[6/7] Calculando métricas de desempenho...")
-    # Métricas
+    # print("\n[6/7] Calculando métricas de desempenho...")
     metricas = calcular_metricas(y_test, y_pred)
+
     print("\n=== Métricas do Modelo ===")
     print(f"Acurácia: {metricas['accuracy']:.3f}")
     print(f"Precision por classe: {metricas['precision']}")
@@ -261,82 +216,11 @@ if __name__ == '__main__':
     print(f"Sensibilidade: {metricas['sensibilidade']:.3f}")
     print(f"Taxa de falsos positivos: {metricas['fp_rate']:.3f}")
 
-    print("\nGerando matriz de confusão...")
-    # Matriz de confusão
-    cm = metricas['confusion_matrix']
-    plt.figure(figsize=(5,4))
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', 
-                xticklabels=['Interictal','Pré-ictal'], 
-                yticklabels=['Interictal','Pré-ictal'])
-    plt.xlabel('Predito')
-    plt.ylabel('Verdadeiro')
-    plt.title('Matriz de Confusão')
-    plt.show()
+    print("\nMatriz de Confusão (terminal):")
+    print(metricas['confusion_matrix'])
 
-    print("\n[7/7] Monitorando uso de memória...")
-    # Memória total usada
+    # print("\n[7/7] Monitorando uso de memória...")
     process = psutil.Process()
     mem_info = process.memory_full_info()
-    print(f"\nMemória total usada (USS + compartilhada): {mem_info.uss / 1024**2:.2f} MB")
-    print(f"Memória virtual total: {mem_info.vms / 1024**2:.2f} MB")
-    
-#     # ---------- PCA 2D - após processamento (CWT incluso) ----------
-# X_scaled = scaler.transform(X_raw)  # Usa o scaler do treinamento
-# X_pca_all = pca.transform(X_scaled)  # Usa o PCA do treinamento
-
-# plt.figure(figsize=(8,6))
-# for label_val, label_name in zip([-1,1], ['Interictal','Pré-ictal']):
-#     idx = y==label_val
-#     plt.scatter(X_pca_all[idx,0], X_pca_all[idx,1], label=label_name, alpha=0.6)
-# plt.xlabel('Componente Principal 1')
-# plt.ylabel('Componente Principal 2')
-# plt.title('PCA 2D - Todas as janelas (pós-CWT)')
-# plt.legend()
-# plt.grid(True)
-# plt.tight_layout()
-# plt.show()
-
-# # ---------- SINAL DO ÚLTIMO PACIENTE ----------
-# ultimo_ecg = ecg  # último paciente processado
-# tempo = np.arange(len(ultimo_ecg)) / fs
-
-# # ---------- CWT ----------
-# scales = np.arange(1, 20)
-# coeffs, freqs = pywt.cwt(ultimo_ecg, scales, 'mexh')
-
-# # ---------- PLOT LADO A LADO ----------
-# plt.figure(figsize=(14,5))
-
-# # Sinal original
-# plt.subplot(1,2,1)
-# plt.plot(tempo, ultimo_ecg)
-# plt.xlabel('Tempo (s)')
-# plt.ylabel('Amplitude ECG')
-# plt.title('Sinal ECG Original')
-# plt.grid(True)
-
-# # CWT
-# plt.subplot(1,2,2)
-# plt.imshow(np.abs(coeffs), extent=[0, tempo[-1], scales[-1], scales[0]], cmap='jet', aspect='auto')
-# plt.colorbar(label='Amplitude CWT')
-# plt.xlabel('Tempo (s)')
-# plt.ylabel('Escalas')
-# plt.title('CWT do ECG')
-# plt.tight_layout()
-# plt.show()
-
-
-# # ECG filtrado
-# ecg_filtrado = butterworth_filter(ultimo_ecg, fs)
-
-# # Sinal filtrado
-# plt.subplot(1,2,2)
-# plt.plot(tempo, ecg_filtrado)
-# plt.xlabel('Tempo (s)')
-# plt.ylabel('Amplitude ECG')
-# plt.title('ECG Filtrado (Butterworth)')
-# plt.grid(True)
-
-# plt.tight_layout()
-# plt.show()
-
+    # print(f"\nMemória total usada (USS + compartilhada): {mem_info.uss / 1024**2:.2f} MB")
+    # print(f"Memória virtual total: {mem_info.vms / 1024**2:.2f} MB")
