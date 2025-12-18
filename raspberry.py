@@ -206,8 +206,21 @@ def preditor_continuo(X_raw, modelo, scaler, pca, limiar_alerta=0.65, save_fig=F
 if __name__ == '__main__':
     print("\n================ INICIALIZAÇÃO DO SISTEMA =================")
     print("Sistema iniciado com sucesso na Raspberry Pi.")
+    # base_path = "/home/pi/MicproRaspberry/synthetic_hrv_bigsep"  # ajuste para Raspberry Pi
+    # n_pacientes = 2
+    
+    
     base_path = "/home/pi/MicproRaspberry/synthetic_hrv_bigsep"  # ajuste para Raspberry Pi
-    n_pacientes = 2
+
+    # Listar todos os pacientes disponíveis
+    print("Pacientes disponíveis:")
+    todos = sorted([f.replace(".hea","") for f in os.listdir(base_path) if f.endswith(".hea")])
+    for p in todos:
+    print(p)
+
+    # Seleção do paciente
+    paciente_escolhido = input("Digite o ID do paciente: ")
+    registros = [paciente_escolhido]
 
     print("\n[1/7] Carregando modelo treinado (SVM + Scaler + PCA)...")
     # Carregar modelo treinado
@@ -270,63 +283,63 @@ if __name__ == '__main__':
     print(f"\nMemória total usada (USS + compartilhada): {mem_info.uss / 1024**2:.2f} MB")
     print(f"Memória virtual total: {mem_info.vms / 1024**2:.2f} MB")
     
-    # ---------- PCA 2D - após processamento (CWT incluso) ----------
-X_scaled = scaler.transform(X_raw)  # Usa o scaler do treinamento
-X_pca_all = pca.transform(X_scaled)  # Usa o PCA do treinamento
+#     # ---------- PCA 2D - após processamento (CWT incluso) ----------
+# X_scaled = scaler.transform(X_raw)  # Usa o scaler do treinamento
+# X_pca_all = pca.transform(X_scaled)  # Usa o PCA do treinamento
 
-plt.figure(figsize=(8,6))
-for label_val, label_name in zip([-1,1], ['Interictal','Pré-ictal']):
-    idx = y==label_val
-    plt.scatter(X_pca_all[idx,0], X_pca_all[idx,1], label=label_name, alpha=0.6)
-plt.xlabel('Componente Principal 1')
-plt.ylabel('Componente Principal 2')
-plt.title('PCA 2D - Todas as janelas (pós-CWT)')
-plt.legend()
-plt.grid(True)
-plt.tight_layout()
-plt.show()
+# plt.figure(figsize=(8,6))
+# for label_val, label_name in zip([-1,1], ['Interictal','Pré-ictal']):
+#     idx = y==label_val
+#     plt.scatter(X_pca_all[idx,0], X_pca_all[idx,1], label=label_name, alpha=0.6)
+# plt.xlabel('Componente Principal 1')
+# plt.ylabel('Componente Principal 2')
+# plt.title('PCA 2D - Todas as janelas (pós-CWT)')
+# plt.legend()
+# plt.grid(True)
+# plt.tight_layout()
+# plt.show()
 
-# ---------- SINAL DO ÚLTIMO PACIENTE ----------
-ultimo_ecg = ecg  # último paciente processado
-tempo = np.arange(len(ultimo_ecg)) / fs
+# # ---------- SINAL DO ÚLTIMO PACIENTE ----------
+# ultimo_ecg = ecg  # último paciente processado
+# tempo = np.arange(len(ultimo_ecg)) / fs
 
-# ---------- CWT ----------
-scales = np.arange(1, 20)
-coeffs, freqs = pywt.cwt(ultimo_ecg, scales, 'mexh')
+# # ---------- CWT ----------
+# scales = np.arange(1, 20)
+# coeffs, freqs = pywt.cwt(ultimo_ecg, scales, 'mexh')
 
-# ---------- PLOT LADO A LADO ----------
-plt.figure(figsize=(14,5))
+# # ---------- PLOT LADO A LADO ----------
+# plt.figure(figsize=(14,5))
 
-# Sinal original
-plt.subplot(1,2,1)
-plt.plot(tempo, ultimo_ecg)
-plt.xlabel('Tempo (s)')
-plt.ylabel('Amplitude ECG')
-plt.title('Sinal ECG Original')
-plt.grid(True)
+# # Sinal original
+# plt.subplot(1,2,1)
+# plt.plot(tempo, ultimo_ecg)
+# plt.xlabel('Tempo (s)')
+# plt.ylabel('Amplitude ECG')
+# plt.title('Sinal ECG Original')
+# plt.grid(True)
 
-# CWT
-plt.subplot(1,2,2)
-plt.imshow(np.abs(coeffs), extent=[0, tempo[-1], scales[-1], scales[0]], cmap='jet', aspect='auto')
-plt.colorbar(label='Amplitude CWT')
-plt.xlabel('Tempo (s)')
-plt.ylabel('Escalas')
-plt.title('CWT do ECG')
-plt.tight_layout()
-plt.show()
+# # CWT
+# plt.subplot(1,2,2)
+# plt.imshow(np.abs(coeffs), extent=[0, tempo[-1], scales[-1], scales[0]], cmap='jet', aspect='auto')
+# plt.colorbar(label='Amplitude CWT')
+# plt.xlabel('Tempo (s)')
+# plt.ylabel('Escalas')
+# plt.title('CWT do ECG')
+# plt.tight_layout()
+# plt.show()
 
 
-# ECG filtrado
-ecg_filtrado = butterworth_filter(ultimo_ecg, fs)
+# # ECG filtrado
+# ecg_filtrado = butterworth_filter(ultimo_ecg, fs)
 
-# Sinal filtrado
-plt.subplot(1,2,2)
-plt.plot(tempo, ecg_filtrado)
-plt.xlabel('Tempo (s)')
-plt.ylabel('Amplitude ECG')
-plt.title('ECG Filtrado (Butterworth)')
-plt.grid(True)
+# # Sinal filtrado
+# plt.subplot(1,2,2)
+# plt.plot(tempo, ecg_filtrado)
+# plt.xlabel('Tempo (s)')
+# plt.ylabel('Amplitude ECG')
+# plt.title('ECG Filtrado (Butterworth)')
+# plt.grid(True)
 
-plt.tight_layout()
-plt.show()
+# plt.tight_layout()
+# plt.show()
 
