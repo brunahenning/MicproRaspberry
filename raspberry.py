@@ -52,9 +52,9 @@ def fill_gaps_with_spline(rpeaks, fs):
     return interpolated_rpeaks
 print("saindo do spline")
 
-def check_ecg_quality(rpeaks):
-    return len(rpeaks) >= 3
-print("saindo do ecg_quality")
+#def check_ecg_quality(rpeaks):
+#    return len(rpeaks) >= 3
+#print("saindo do ecg_quality")
 
 def calculate_hrv_metrics(rpeaks, fs=fs):
     rr_intervals = np.diff(rpeaks)/fs
@@ -90,7 +90,8 @@ def calculate_hrv_metrics(rpeaks, fs=fs):
 
 def extract_hrv_parameters(ecg_segment, fs=fs):
     rpeaks = detect_r_peaks_cwt(ecg_segment, sampling_rate=fs)
-    xrr = len(rpeaks) >= 3 #check_ecg_quality(rpeaks)
+    xrr = len(rpeaks) >= 3 
+    #check_ecg_quality(rpeaks)
     print("xrr")
     
     # if not xrr:
