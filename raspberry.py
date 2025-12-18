@@ -33,7 +33,7 @@ def butterworth_filter(ecg_signal, fs, lowcut=0.5, highcut=40, order=2):
     low = lowcut / nyq
     high = highcut / nyq
     b, a = butter(order, [low, high], btype='band')
-    print("saindo do butterworth")
+    #print("saindo do butterworth")
     return filtfilt(b, a, ecg_signal)
 
 
@@ -42,7 +42,7 @@ def detect_r_peaks_cwt(ecg_signal, sampling_rate=fs, wavelet='mexh', scale_range
     coeffs,_ = pywt.cwt(ecg_signal, scales, wavelet)
     cwt_sum = np.sum(np.abs(coeffs), axis=0)
     peaks,_ = scipy.signal.find_peaks(cwt_sum, distance=sampling_rate/2.5)      
-    print("saindo do r-peaks")  
+    #print("saindo do r-peaks")  
     return peaks
 
 def fill_gaps_with_spline(rpeaks, fs):
@@ -50,7 +50,7 @@ def fill_gaps_with_spline(rpeaks, fs):
     cs = CubicSpline(time_vector, rpeaks)
     new_time_vector = np.linspace(0,time_vector[-1],len(rpeaks))
     interpolated_rpeaks = cs(new_time_vector)
-    print("saindo do spline")
+    #print("saindo do spline")
     return interpolated_rpeaks
 
 #def check_ecg_quality(rpeaks):
@@ -58,6 +58,7 @@ def fill_gaps_with_spline(rpeaks, fs):
 #print("saindo do ecg_quality")
 
 def calculate_hrv_metrics(rpeaks, fs=fs):
+    print("0")
     rr_intervals = np.diff(rpeaks)/fs
     print("1")
     if len(rr_intervals)<2:
@@ -140,6 +141,8 @@ def gerar_labels_por_janela(labels, Wo=Wo, S=S, fs=fs):
 #################################################################################################
 
 def carregar_todos_pacientes(base_path, registros=None):
+     print("entrando em carregar_todos_pacientes")
+
     if registros is None:
         registros = sorted([f.replace(".hea","") for f in os.listdir(base_path) if f.endswith(".hea")])
     all_X, all_y = [], []
@@ -157,6 +160,7 @@ def carregar_todos_pacientes(base_path, registros=None):
         y = gerar_labels_por_janela(labels_amostra)
         all_X.append(X)
         all_y.append(y)
+        print("saindo de carregar_todos_pacientes")
     return np.vstack(all_X), np.hstack(all_y)
 
 #################################################################################################
