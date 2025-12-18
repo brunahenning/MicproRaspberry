@@ -33,24 +33,25 @@ def butterworth_filter(ecg_signal, fs, lowcut=0.5, highcut=40, order=2):
     low = lowcut / nyq
     high = highcut / nyq
     b, a = butter(order, [low, high], btype='band')
+    print("saindo do butterworth")
     return filtfilt(b, a, ecg_signal)
-print("saindo do butterworth")
+
 
 def detect_r_peaks_cwt(ecg_signal, sampling_rate=fs, wavelet='mexh', scale_range=(1,20)):
     scales = np.arange(scale_range[0], scale_range[1])
     coeffs,_ = pywt.cwt(ecg_signal, scales, wavelet)
     cwt_sum = np.sum(np.abs(coeffs), axis=0)
-    peaks,_ = scipy.signal.find_peaks(cwt_sum, distance=sampling_rate/2.5)
+    peaks,_ = scipy.signal.find_peaks(cwt_sum, distance=sampling_rate/2.5)      
+    print("saindo do r-peaks")  
     return peaks
-print("saindo do r-peaks")
 
 def fill_gaps_with_spline(rpeaks, fs):
     time_vector = np.arange(len(rpeaks))/fs
     cs = CubicSpline(time_vector, rpeaks)
     new_time_vector = np.linspace(0,time_vector[-1],len(rpeaks))
     interpolated_rpeaks = cs(new_time_vector)
+    print("saindo do spline")
     return interpolated_rpeaks
-print("saindo do spline")
 
 #def check_ecg_quality(rpeaks):
 #    return len(rpeaks) >= 3
