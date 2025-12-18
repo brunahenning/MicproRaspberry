@@ -213,16 +213,19 @@ if __name__ == '__main__':
     base_path = "/home/pi/MicproRaspberry/synthetic_hrv_bigsep"  # ajuste para Raspberry Pi
     # base_path = "C:/Nova_tentativa_tcc/synthetic_hrv_bigsep"
 
-    # Listar todos os pacientes disponíveis
-    print("Pacientes disponíveis:")
-    todos = sorted([f.replace(".hea","") for f in os.listdir(base_path) if f.endswith(".hea")])
-    for p in todos:
-        print(p)
+    PACIENTE_ID = "synth_02"
+    registros = [PACIENTE_ID]
+    
+    # Validação silenciosa
+    arquivo_hea = os.path.join(base_path, PACIENTE_ID + ".hea")
+    arquivo_seiz = os.path.join(base_path, PACIENTE_ID + ".seizures")
 
-    # Seleção do paciente
-    paciente_escolhido = input("Digite o ID do paciente: ")
-    registros = [paciente_escolhido]
+    if not os.path.exists(arquivo_hea):
+    raise FileNotFoundError(f"Arquivo não encontrado: {arquivo_hea}")
 
+    if not os.path.exists(arquivo_seiz):
+    raise FileNotFoundError(f"Arquivo não encontrado: {arquivo_seiz}")
+    
     print("\n[1/7] Carregando modelo treinado (SVM + Scaler + PCA)...")
     # Carregar modelo treinado
     data = joblib.load("modelo_svm.joblib")
