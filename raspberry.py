@@ -93,10 +93,10 @@ def extract_hrv_parameters(ecg_segment, fs=fs):
     xrr =check_ecg_quality(rpeaks)
     print("xrr")
     
-    if not xrr
-        print("1")
-        return [0]*7
-        print("2")
+    # if not xrr:
+    print("1")
+    return [0]*7
+    print("2")
     cleaned = fill_gaps_with_spline(rpeaks, fs)
     print("1")
     return calculate_hrv_metrics(cleaned, fs)
