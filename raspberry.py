@@ -91,7 +91,9 @@ def calculate_hrv_metrics(rpeaks, fs=fs):
 def extract_hrv_parameters(ecg_segment, fs=fs):
     rpeaks = detect_r_peaks_cwt(ecg_segment, sampling_rate=fs)
     if not check_ecg_quality(rpeaks):
+        print("1")
         return [0]*7
+        print("2")
     cleaned = fill_gaps_with_spline(rpeaks, fs)
     print("1")
     return calculate_hrv_metrics(cleaned, fs)
