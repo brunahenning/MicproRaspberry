@@ -141,8 +141,7 @@ def gerar_labels_por_janela(labels, Wo=Wo, S=S, fs=fs):
 #################################################################################################
 
 def carregar_todos_pacientes(base_path, registros=None):
-     print("entrando em carregar_todos_pacientes")
-
+    print("0")
     if registros is None:
         registros = sorted([f.replace(".hea","") for f in os.listdir(base_path) if f.endswith(".hea")])
     all_X, all_y = [], []
@@ -160,7 +159,6 @@ def carregar_todos_pacientes(base_path, registros=None):
         y = gerar_labels_por_janela(labels_amostra)
         all_X.append(X)
         all_y.append(y)
-        print("saindo de carregar_todos_pacientes")
     return np.vstack(all_X), np.hstack(all_y)
 
 #################################################################################################
