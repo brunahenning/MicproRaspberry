@@ -127,7 +127,7 @@ def carregar_todos_pacientes(base_path, n_pacientes=None):
         registros = registros[:n_pacientes]
     all_X, all_y = [], []
     for rec in registros:
-        print(f"\n[DATA] Processando paciente {i+1}/{len(registros)} → {rec}")
+        # print(f"\n[DATA] Processando paciente {i+1}/{len(registros)} → {rec}")
         path_record = os.path.join(base_path, rec)
         record = wfdb.rdrecord(path_record)
         ecg = record.p_signal[:,0]
