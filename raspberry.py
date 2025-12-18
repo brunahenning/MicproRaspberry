@@ -93,7 +93,7 @@ def sliding_window_hrv(ecg, fs=fs, Wo=Wo, S=S):
         seg = ecg[start:start+Wo_s]
         X.append(extract_hrv_parameters(seg, fs))
     return np.array(X)
-print(f"[HRV] Total de janelas processadas: {len(X)}")
+# print(f"[HRV] Total de janelas processadas: {len(X)}")
 
 #################################################################################################
 # LABELS
@@ -211,12 +211,13 @@ if __name__ == '__main__':
     
     
     base_path = "/home/pi/MicproRaspberry/synthetic_hrv_bigsep"  # ajuste para Raspberry Pi
+    # base_path = "C:/Nova_tentativa_tcc/synthetic_hrv_bigsep"
 
     # Listar todos os pacientes disponíveis
     print("Pacientes disponíveis:")
     todos = sorted([f.replace(".hea","") for f in os.listdir(base_path) if f.endswith(".hea")])
     for p in todos:
-    print(p)
+        print(p)
 
     # Seleção do paciente
     paciente_escolhido = input("Digite o ID do paciente: ")
@@ -233,7 +234,7 @@ if __name__ == '__main__':
     print("\n[2/7] Carregando e processando dados ECG...")
     # Carregar dados de teste
     X_raw, y = carregar_todos_pacientes(base_path, n_pacientes)
-    print(f"Total de janelas processadas: {len(y)}")
+   
 
     print("\n[3/7] Realizando divisão treino/teste (70/30)...")
     # Split 70/30
@@ -248,7 +249,7 @@ if __name__ == '__main__':
     X_test_pca = pca.transform(X_test_scaled)
     print(f"Número de componentes PCA: {X_test_pca.shape[1]}")
 
-    print("\n[5/7] Executando predição com SVM..."
+    print("\n[5/7] Executando predição com SVM...")
     # Predição
     y_pred = modelo_svm.predict(X_test_pca)
     print("Predição finalizada.")
