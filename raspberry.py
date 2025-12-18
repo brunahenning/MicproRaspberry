@@ -57,7 +57,7 @@ def check_ecg_quality(rpeaks):
 print("saindo do ecg_quality")
 
 def calculate_hrv_metrics(rpeaks, fs=fs):
-    #rr_intervals = np.diff(rpeaks)/fs
+    rr_intervals = np.diff(rpeaks)/fs
     print("1")
     if len(rr_intervals)<2:
         print("2")
@@ -93,8 +93,10 @@ def extract_hrv_parameters(ecg_segment, fs=fs):
     if not check_ecg_quality(rpeaks):
         return [0]*7
     cleaned = fill_gaps_with_spline(rpeaks, fs)
+    print("1")
     return calculate_hrv_metrics(cleaned, fs)
-
+    print("2")
+    
 def sliding_window_hrv(ecg, fs=fs, Wo=Wo, S=S):
     Wo_s = int(Wo*fs)
     S_s = int(S*fs)
