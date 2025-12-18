@@ -42,6 +42,7 @@ def detect_r_peaks_cwt(ecg_signal, sampling_rate=fs, wavelet='mexh', scale_range
     cwt_sum = np.sum(np.abs(coeffs), axis=0)
     peaks,_ = scipy.signal.find_peaks(cwt_sum, distance=sampling_rate/2.5)
     return peaks
+print("saindo do r-peaks")
 
 def fill_gaps_with_spline(rpeaks, fs):
     time_vector = np.arange(len(rpeaks))/fs
@@ -49,9 +50,11 @@ def fill_gaps_with_spline(rpeaks, fs):
     new_time_vector = np.linspace(0,time_vector[-1],len(rpeaks))
     interpolated_rpeaks = cs(new_time_vector)
     return interpolated_rpeaks
+print("saindo do spline")
 
 def check_ecg_quality(rpeaks):
     return len(rpeaks) >= 3
+print("saindo do ecg_quality")
 
 def calculate_hrv_metrics(rpeaks, fs=fs):
     rr_intervals = np.diff(rpeaks)/fs
@@ -65,6 +68,7 @@ def calculate_hrv_metrics(rpeaks, fs=fs):
         hf = hrv.get('HRV_HF',[0])[0]
     except:
         lf = hf = 0
+        print("saindo do LF")
     def sample_entropy(data,m=2):
         N = len(data)
         if N < m+2: return 0
@@ -78,6 +82,7 @@ def calculate_hrv_metrics(rpeaks, fs=fs):
     csi = lf/hf if hf!=0 else 0
     cvi = hf
     return [sdnn, rmssd, lf, hf, sampen, csi, cvi]
+    print("saindo do hrv")
 
 def extract_hrv_parameters(ecg_segment, fs=fs):
     rpeaks = detect_r_peaks_cwt(ecg_segment, sampling_rate=fs)
