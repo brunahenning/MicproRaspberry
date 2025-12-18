@@ -123,25 +123,35 @@ def gerar_labels_por_janela(labels, Wo=Wo, S=S, fs=fs):
 
 def carregar_todos_pacientes(base_path, n_pacientes=None):
     registros = sorted([f.replace(".hea","") for f in os.listdir(base_path) if f.endswith(".hea")])
+    
     if n_pacientes is not None:
         registros = registros[:n_pacientes]
+
     all_X, all_y = [], []
-    for rec in registros:
-        # print(f"\n[DATA] Processando paciente {i+1}/{len(registros)} → {rec}")
+
+    for i, rec in enumerate(registros):
+        print(f"\n[DATA] Processando paciente {i+1}/{len(registros)} → {rec}")
+
         path_record = os.path.join(base_path, rec)
         record = wfdb.rdrecord(path_record)
         ecg = record.p_signal[:,0]
         fs = record.fs
+
         ecg = butterworth_filter(ecg, fs)
-        path_seiz = os.path.join(base_path, rec+".seizures")
-        with open(path_seiz,"r") as f:
+
+        path_seiz = os.path.join(base_path, rec + ".seizures")
+        with open(path_seiz, "r") as f:
             onsets = [float(line.strip().split()[0]) for line in f]
+
         labels_amostra = gerar_labels_inter_pre(len(ecg), fs, onsets)
         X = sliding_window_hrv(ecg, fs)
         y = gerar_labels_por_janela(labels_amostra)
+
         all_X.append(X)
         all_y.append(y)
+
     return np.vstack(all_X), np.hstack(all_y)
+
 
 #################################################################################################
 # PCA (para teste)
