@@ -34,6 +34,7 @@ def butterworth_filter(ecg_signal, fs, lowcut=0.5, highcut=40, order=2):
     high = highcut / nyq
     b, a = butter(order, [low, high], btype='band')
     return filtfilt(b, a, ecg_signal)
+print("saindo do butterworth")
 
 def detect_r_peaks_cwt(ecg_signal, sampling_rate=fs, wavelet='mexh', scale_range=(1,20)):
     scales = np.arange(scale_range[0], scale_range[1])
